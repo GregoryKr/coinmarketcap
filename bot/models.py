@@ -3,10 +3,6 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.orm import relationship, declarative_base
-import locale
-
-
-locale.setlocale(locale.LC_TIME, 'ru_RU')
 
 
 moscow_time = pytz.timezone('Europe/Moscow')
@@ -19,10 +15,13 @@ class Coin(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    coin_id = Column(Integer, ForeignKey('coin_rate.id'))
     date = Column(DateTime, default=datetime.now(moscow_time))
     coin_name = Column(String(50))
     border_value = Column(Float, nullable=False)
-    user = relationship('User', back_populates='coins')
+    # coin_price = Column(Float, ForeignKey('coin_rate.coin_price'))
+    users = relationship('User', back_populates='coins')
+    coin_rate = relationship('Coins_rates', back_populates='coin')
 
     # __mapper_args__ = {
     #     'polymorphic_identity': 'coin',
@@ -38,18 +37,26 @@ class User(Base):
     # weight = Column(Float, nullable=False)
     # height = Column(Float)
 
-    coins = relationship('Coin', back_populates='user')
-# class Running(Workout):
-#     __tablename__ = 'running'
+    coins = relationship('Coin', back_populates='users')
+
+
+class Coins_rates(Base):
+    __tablename__ = 'coin_rate'
+
+    id = Column(Integer, primary_key=True)
+    coin_price = Column(Float, nullable=False)
+    coin_name = Column(String(70), nullable=False)
+    # speed = Column(Float, nullable=False)
+    # spent_calories = Column(Float, nullable=False)
+    # distance = Column(Float, nullable=False)
+
+    coin = relationship('Coin', back_populates='coin_rate')
+
+# class Coin_name(Base):
+#     __tablename__ = 'names'
 #
-#     id = Column(Integer, ForeignKey('workout.id'), primary_key=True)
-#     action = Column(Integer, nullable=False)
-#     duration = Column(Integer, nullable=False)
-#     speed = Column(Float, nullable=False)
-#     spent_calories = Column(Float, nullable=False)
-#     distance = Column(Float, nullable=False)
-#
-#     workout = relationship('Workout', back_populates='running')
+#     id = Column(Integer, primary_key=True)
+#     name = Column(String(70))
 #
 #     __mapper_args__ = {
 #         'polymorphic_identity': 'running',

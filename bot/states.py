@@ -3,8 +3,9 @@ from aiogram.fsm.state import StatesGroup, State
 
 class DataState(StatesGroup):
     name = State()
-    coin = State()
-    # height = State()
+    coin_btc = State()
+    coin_eth = State()
+    border_value = State()
 
 
 # class RunState(StatesGroup):
