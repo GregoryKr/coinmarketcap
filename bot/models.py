@@ -1,7 +1,8 @@
 import pytz
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Boolean
 from sqlalchemy.orm import relationship, declarative_base
 
 
@@ -16,9 +17,10 @@ class Coin(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     coin_id = Column(Integer, ForeignKey('coin_rate.id'))
-    date = Column(DateTime, default=datetime.now(moscow_time))
+    date = Column(TIMESTAMP(timezone=True), default=lambda: datetime.now(moscow_time))  # TIMESTAMP WITH TIME ZONE  DateTime, default=datetime.now(moscow_time)
     coin_name = Column(String(50))
     border_value = Column(Float, nullable=False)
+    expectations = Column(Boolean, nullable=False)
     # coin_price = Column(Float, ForeignKey('coin_rate.coin_price'))
     users = relationship('User', back_populates='coins')
     coin_rate = relationship('Coins_rates', back_populates='coin')
@@ -34,7 +36,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     tg_id = Column(Integer, nullable=False, unique=True)
     name = Column(String(80), nullable=False)
-    # weight = Column(Float, nullable=False)
+    chat_id = Column(Integer, nullable=False)
     # height = Column(Float)
 
     coins = relationship('Coin', back_populates='users')

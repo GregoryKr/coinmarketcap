@@ -66,7 +66,7 @@ cursor = conn.cursor()
 
 conn.commit()
 
-print("Данные добавлены")
+# print("Данные добавлены")
 
 def update_coin_table():
   """
@@ -77,14 +77,14 @@ def update_coin_table():
     conn = psycopg2.connect(dbname="coin_bot", user="postgres", password="03121981", host="127.0.0.1")
     cursor = conn.cursor()
     while True:
-      time.sleep(5)
+      time.sleep(10)
       response = session.get(url)  # , params=parameters
       data = json.loads(response.text)
       coins_list_updated = []
       for coin in data['data']:
         coins_list_updated.append((coin['name'], coin['quote']['USD']['price']))
-      pprint(coins_list_updated)
-      print("обновленный список")
+      # pprint(coins_list_updated)
+      # print("обновленный список")
 
       # cursor.execute('ALTER SEQUENCE table_id_seq RESTART WITH 1;')
       cursor.executemany("UPDATE coin_rate SET coin_price=%s WHERE coin_name=%s", ([(price, name) for name, price in coins_list_updated]))
