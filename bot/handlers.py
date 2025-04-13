@@ -104,7 +104,7 @@ async def name_handler(message: Message, state: FSMContext) -> None:
 async def get_all_coins():
     async with AsyncSessionLocal() as session:
         result = await session.execute(select(Coins_rates.coin_name))
-        coins_names_tuple = result.scalars().all()  # Получаем все результ
+        coins_names_tuple = result.scalars().all()  # Получаем все результаты
     # coins_names_list = [x[0] for x in coins_names_tuple]
     print(coins_names_tuple)
     return coins_names_tuple
@@ -189,13 +189,23 @@ async def show_all_coins(call: types.CallbackQuery, state: FSMContext) -> None:
         user_coins_id = user.id
         result = await session.execute(select(Coin).filter_by(user_id=user_coins_id))
         coins = result.scalars().all()  # Получаем все результаты
-    my_coins = [] # список имен криптовалют пользователя
-    for coin in coins:
-        coin_name = coin.coin_name
-        my_coins.append(coin_name)
-        print(my_coins)
-    text = "; ".join(my_coins) # получаем строку из списка с именами криптовалют пользователя
-    await call.message.answer(text=text)
+    if coins:
+        for coin in coins:
+            my_coins = []  # список имен криптовалют пользователя
+            coin_name = coin.coin_name
+            my_coins.append(coin_name)
+            border_value = coin.border_value
+            my_coins.append(f"граничная цен: {border_value}")
+            expectation = coin.expectations
+            if expectation:
+                my_coins.append("wait for growth of coin")
+            else:
+                my_coins.append("wait for fall of coin")
+            print(my_coins)
+            text = "; ".join(my_coins) # получаем строку из списка с именами криптовалют пользователя
+            await call.message.answer(text=text)
+    else:
+        await call.message.answer(text="в бд нет криптовалют")
 
 
 @router.message(DataState.coin_btc)
