@@ -194,16 +194,22 @@ async def show_all_coins(call: types.CallbackQuery, state: FSMContext) -> None:
             my_coins = []  # список имен криптовалют пользователя
             coin_name = coin.coin_name
             my_coins.append(coin_name)
+            result = await session.execute(select(Coins_rates).filter_by(coin_name=coin_name))
+            coin_rate = result.scalars().first()
+            coin_price = coin_rate.coin_price
+            my_coins.append(f"текущая цена: {coin_price}")
             border_value = coin.border_value
-            my_coins.append(f"граничная цен: {border_value}")
+            my_coins.append(f"граничная цена: {border_value}")
             expectation = coin.expectations
             if expectation:
                 my_coins.append("wait for growth of coin")
             else:
                 my_coins.append("wait for fall of coin")
             print(my_coins)
-            text = "; ".join(my_coins) # получаем строку из списка с именами криптовалют пользователя
-            await call.message.answer(text=text)
+            for element in my_coins:
+                text = element
+            # text = "; ".join(my_coins) # получаем строку из списка с именами криптовалют пользователя
+                await call.message.answer(text=text)
     else:
         await call.message.answer(text="в бд нет криптовалют")
 
